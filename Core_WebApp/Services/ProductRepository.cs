@@ -64,17 +64,21 @@ namespace Core_WebApp.Services
         public async Task<Product> UpdateAsync(int id, Product entity)
         {
             // seacrh record based on Primary key
-            var cat = await ctx.Products.FindAsync(id);
-            if (cat != null)
+            // C# 7.0+ new declaratrion knonw as 'Discard'
+            var _ = await ctx.Products.FindAsync(id);
+
+            if (_ != null)
             {
-                cat.ProductId = entity.ProductId;
-                cat.ProductName = entity.ProductName;
-                cat.Price = entity.Price;
-                cat.ProductRowId = entity.ProductRowId;
-                
+                _.ProductId = entity.ProductId;
+                _.ProductName = entity.ProductName;
+                _.Description = entity.Description;
+                _.Price = entity.Price;
+                _.CategoryRowId = entity.CategoryRowId;
                 await ctx.SaveChangesAsync();
+                return _;
             }
-            return cat;
+
+            return entity;
         }
     }
 }

@@ -95,8 +95,8 @@ namespace Core_WebApp
             // reda all .js/.css files from wwwroot folder and respond to
             // thesse files to browser
             app.UseStaticFiles();
-
             // create routing table and verify the route expression
+
             app.UseRouting();
             // security
             app.UseAuthentication();

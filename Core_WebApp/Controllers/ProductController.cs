@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core_WebApp.CustomSessions;
 using Core_WebApp.Models;
 using Core_WebApp.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Core_WebApp.Controllers
 {
@@ -15,74 +18,101 @@ namespace Core_WebApp.Controllers
     /// </summary>
     public class ProductController : Controller
     {
-        private readonly IRepository<Product, int> ProdRepository;
+        private readonly IRepository<Product, int> prdRepository;
+        private readonly IRepository<Category, int> catRepository;
         /// <summary>
         /// Inject the ProductRepository as constructor injection
         /// </summary>
-        public ProductController(IRepository<Product, int> ProdRepository)
+        public ProductController(IRepository<Product, int> prdRepository,
+             IRepository<Category, int> catRepository)
         {
-            this.ProdRepository = ProdRepository;
+            this.prdRepository = prdRepository;
+            this.catRepository = catRepository;
         }
 
         public async Task<IActionResult> Index()
         {
-            var cats = await ProdRepository.GetAsync();
-            return View(cats);
+            //var cats = await prdRepository.GetAsync();
+            //return View(cats);
+
+            List<Product> prds = new List<Product>();
+            var cat = HttpContext.Session.GetSessionData<Category>("Category");
+            var id = HttpContext.Session.GetInt32("CategoryRowId");
+            if (id > 0)
+            {
+                prds = (from p in prdRepository.GetAsync().Result.ToList()
+                        where p.CategoryRowId == id
+                        select p).ToList();
+            }
+            else
+            {
+                prds = prdRepository.GetAsync().Result.ToList();
+            }
+
+            return View(prds);
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View(new Product());
+            var prd = new Product();
+            // define a ViewBag that will pass the List of
+            // Categories to the Create View
+            ViewBag.CategoryRowId =
+                new SelectList( await catRepository.GetAsync(),
+                "CategoryRowId",
+                "CategoryName");
+
+            return View(prd);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Product product)
+        public async Task<IActionResult> Create(Product Product)
         {
-            // check if the Cateogry Posted Model is valid
+            // check if the Product Posted Model is valid
             if (ModelState.IsValid)
             {
                 // create a new Product Record
-                product = await ProdRepository.CraeteAsync(product);
+                Product = await prdRepository.CraeteAsync(Product);
                 // redirect to Index Page
                 return RedirectToAction("Index");
             }
             else
             {
                 // else stey on the same page with errors
-                return View(product);
+                return View(Product);
             }
         }
 
         public async Task<IActionResult> Edit(int id)
         {
             // search the record being edited
-            var cat = await ProdRepository.GetAsync(id);
+            var prd = await prdRepository.GetAsync(id);
             // return a view with record being edited
-            return View(cat);
+            return View(prd);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, Product product)
+        public async Task<IActionResult> Edit(int id, Product Product)
         {
-            // check if the Cateogry Posted Model is valid
+            // check if the Product Posted Model is valid
             if (ModelState.IsValid)
             {
                 // update the Product Record
-                product = await ProdRepository.UpdateAsync(id, product);
+                Product = await prdRepository.UpdateAsync(id, Product);
                 // redirect to Index Page
                 return RedirectToAction("Index");
             }
             else
             {
                 // else stey on the same page with errors
-                return View(product);
+                return View(Product);
             }
         }
 
         public async Task<IActionResult> Delete(int id)
         {
             // search the record being edited
-            var res = await ProdRepository.DeleteAsync(id);
+            var res = await prdRepository.DeleteAsync(id);
             return RedirectToAction("Index");
         }
     }
