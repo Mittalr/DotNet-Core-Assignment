@@ -97,6 +97,8 @@ namespace Core_WebApp
             app.UseStaticFiles();
             // create routing table and verify the route expression
 
+            app.UseSession();
+
             app.UseRouting();
             // security
             app.UseAuthentication();
