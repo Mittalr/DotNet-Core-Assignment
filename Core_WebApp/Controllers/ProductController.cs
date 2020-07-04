@@ -30,11 +30,8 @@ namespace Core_WebApp.Controllers
             this.catRepository = catRepository;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            //var cats = await prdRepository.GetAsync();
-            //return View(cats);
-
             List<Product> prds = new List<Product>();
             var cat = HttpContext.Session.GetSessionData<Category>("Category");
             var id = HttpContext.Session.GetInt32("CategoryRowId");
@@ -48,7 +45,6 @@ namespace Core_WebApp.Controllers
             {
                 prds = prdRepository.GetAsync().Result.ToList();
             }
-
             return View(prds);
         }
 
@@ -58,7 +54,7 @@ namespace Core_WebApp.Controllers
             // define a ViewBag that will pass the List of
             // Categories to the Create View
             ViewBag.CategoryRowId =
-                new SelectList( await catRepository.GetAsync(),
+                new SelectList(await catRepository.GetAsync(),
                 "CategoryRowId",
                 "CategoryName");
 

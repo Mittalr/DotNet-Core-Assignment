@@ -60,7 +60,10 @@ namespace Core_WebApp
                        Configuration.GetConnectionString("AppDbConnection")
                       )
                 );
+            services.AddMvc().AddSessionStateTempDataProvider();
+            services.AddSession();
 
+            
             // The Identityt Management for Authentication
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -96,13 +99,13 @@ namespace Core_WebApp
             // thesse files to browser
             app.UseStaticFiles();
             // create routing table and verify the route expression
-
             app.UseSession();
 
             app.UseRouting();
             // security
             app.UseAuthentication();
             app.UseAuthorization();
+            
 
             // publish the application on Host http Endpoint
             app.UseEndpoints(endpoints =>
