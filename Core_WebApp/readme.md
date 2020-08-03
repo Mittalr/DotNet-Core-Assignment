@@ -28,8 +28,7 @@
 		- Microsoft.EntityFrameworkCore.Design
 	- EF Core Object Model
 		- DbContext
-			- Class, used to connect to Database Server using 
-				connection string
+			- Class, used to connect to Database Server using the Connection string
 			- Class used to map with Tables using DbSet<T>
 			- Class used to perfrom Db Transactions using
 				SaveChanges() and SaveChangesAsync() methods
